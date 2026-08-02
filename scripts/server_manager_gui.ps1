@@ -124,16 +124,25 @@ function Refresh-TaskToggle {
 # ---------------------------------------------------------------- async workers
 # Simple async runner using Start-Job (child process, supports $using:).
 # Streams job output to the output box and calls onDone when finished.
+# NOTE: event-handler scriptblocks cannot see function-local variables, so
+# job state is kept in $script:AsyncStore and the timer is reached via $this.
+$script:AsyncStore = @{}
 function Start-AsyncJob([scriptblock]$job, [scriptblock]$onDone) {
+    $id = [guid]::NewGuid().ToString('N')
     $jb = Start-Job -ScriptBlock $job
+    $script:AsyncStore[$id] = @{ Job = $jb; Done = $onDone }
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 300
+    $timer.Tag = $id
     $timer.Add_Tick({
-        if ($jb.State -ne 'Running') {
-            $timer.Stop(); $timer.Dispose()
-            Receive-Job $jb -ErrorAction SilentlyContinue | ForEach-Object { Add-Output $_ }
-            Remove-Job $jb -Force -ErrorAction SilentlyContinue
-            if ($onDone) { & $onDone }
+        $entry = $script:AsyncStore[$this.Tag]
+        if (-not $entry) { return }
+        if ($entry.Job.State -ne 'Running') {
+            $this.Stop(); $this.Dispose()
+            Receive-Job $entry.Job -ErrorAction SilentlyContinue | ForEach-Object { Add-Output $_ }
+            Remove-Job $entry.Job -Force -ErrorAction SilentlyContinue
+            $script:AsyncStore.Remove($this.Tag)
+            if ($entry.Done) { & $entry.Done }
         }
     })
     $timer.Start()
