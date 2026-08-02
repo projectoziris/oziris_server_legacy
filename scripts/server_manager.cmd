@@ -16,7 +16,7 @@ if errorlevel 1 (
 cls
 echo.
 echo  ================================================
-echo   OZI-RIS Server Manager
+echo   OZI-RIS Server Manager by: Lauis Kunang
 echo  ================================================
 echo   1. Start services
 echo   2. Stop services
