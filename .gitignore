@@ -1,0 +1,15 @@
+# Binary distributions (download per docs\INSTALLATION.md)
+apache/
+php54/
+mariadb/
+phpmyadmin/
+
+# Runtime artifacts
+logs/
+backup/
+_tmptest/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+*.swp
