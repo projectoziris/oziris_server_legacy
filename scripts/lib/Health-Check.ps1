@@ -82,17 +82,42 @@ try {
     Add-Result 'PHP stack' 'CRIT' 'health.php unreachable'
 }
 
-# ---- PHP CLI binary ----
+# ---- PHP CLI binary (absolute path, never PATH/registry) ----
 $phpExe = Join-Path $install 'php54\php.exe'
-if (Test-Path $phpExe) {
-    $ver = & $phpExe -v 2>&1 | Select-Object -First 1
-    if ($LASTEXITCODE -eq 0 -and $ver) {
-        Add-Result 'PHP CLI' 'OK' $ver
-    } else {
-        Add-Result 'PHP CLI' 'WARN' 'php.exe present but did not run (VC9 runtime?)'
-    }
+if (-not (Test-Path $phpExe)) {
+    Add-Result 'PHP CLI' 'ERROR' 'php54\php.exe not found'
 } else {
-    Add-Result 'PHP CLI' 'WARN' 'php.exe not found'
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $phpExe
+    $psi.Arguments = '-v'
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    try {
+        $proc = [System.Diagnostics.Process]::Start($psi)
+        $stdout = $proc.StandardOutput.ReadToEnd()
+        $stderr = $proc.StandardError.ReadToEnd()
+        $proc.WaitForExit()
+        $code = $proc.ExitCode
+    } catch {
+        Add-Result 'PHP CLI' 'ERROR' ("php.exe could not be started: " + $_.Exception.Message)
+        $code = $null
+    }
+    if ($code -eq 0) {
+        $m = [regex]::Match($stdout, 'PHP (\d+\.\d+(\.\d+)?)')
+        if ($m.Success) {
+            Add-Result 'PHP CLI' 'OK' ('PHP {0} (bundled)' -f $m.Groups[1].Value)
+        } else {
+            Add-Result 'PHP CLI' 'OK' 'PHP CLI responded (bundled)'
+        }
+    } elseif ($null -ne $code) {
+        $err = ($stderr + "`n" + $stdout).Trim()
+        if ($err) { $err = ($err -replace "`r?`n", ' ').Trim() }
+        $detail = 'php.exe failed (exit 0x{0:X})' -f $code
+        if ($err) { $detail += ' - ' + $err }
+        Add-Result 'PHP CLI' 'ERROR' $detail
+    }
 }
 
 # ---- database connectivity ----
@@ -155,7 +180,7 @@ if ($cpu) {
 # ---- summary ----
 $worst = 'OK'
 foreach ($r in $results) {
-    if ($r.Status -eq 'CRIT') { $worst = 'CRIT'; break }
+    if ($r.Status -eq 'CRIT' -or $r.Status -eq 'ERROR') { $worst = 'CRIT'; break }
     if ($r.Status -eq 'WARN' -and $worst -ne 'CRIT') { $worst = 'WARN' }
 }
 
@@ -163,7 +188,7 @@ if ($Json) {
     [pscustomobject]@{ status = $worst.ToLower(); checks = $results } | ConvertTo-Json -Depth 4
 } else {
     foreach ($r in $results) {
-        $icon = switch ($r.Status) { 'OK' { '[OK]  ' } 'WARN' { '[WARN]' } 'CRIT' { '[CRIT]' } 'SKIP' { '[SKIP]' } }
+        $icon = switch ($r.Status) { 'OK' { '[OK]  ' } 'WARN' { '[WARN]' } 'CRIT' { '[CRIT]' } 'ERROR' { '[ERROR]' } 'SKIP' { '[SKIP]' } }
         "{0} {1,-18} {2}" -f $icon, $r.Name, $r.Detail
     }
     ""

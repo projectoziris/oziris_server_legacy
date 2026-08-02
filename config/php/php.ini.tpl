@@ -12,8 +12,12 @@ precision = 14
 output_buffering = 4096
 zlib.output_compression = Off
 implicit_flush = Off
-serialize_precision = 17
+serialize_precision = 100
 default_charset = "UTF-8"
+
+; PERFORMANCE: reduce filesystem stat() calls (legacy WAMP server parity).
+realpath_cache_size = 64k
+realpath_cache_ttl = 600
 
 ; Enable the required extensions (module 3 requirement).
 extension_dir = "@@PHP_ROOT@@\ext"
@@ -21,6 +25,8 @@ enable_dl = Off
 
 extension=php_mysqli.dll
 extension=php_pdo_mysql.dll
+; Legacy mysql_* API required by the MYXSIR application.
+extension=php_mysql.dll
 extension=php_gd2.dll
 extension=php_openssl.dll
 extension=php_curl.dll
@@ -33,6 +39,8 @@ display_errors = Off
 display_startup_errors = Off
 log_errors = On
 log_errors_max_len = 1024
+; Legacy app may read $php_errormsg (track_errors = On).
+track_errors = On
 error_log = "@@PHP_ROOT@@\logs\php-error.log"
 
 ; Resource limits.
@@ -52,6 +60,9 @@ session.save_path = "@@PHP_ROOT@@\tmp"
 session.use_cookies = 1
 session.use_only_cookies = 1
 session.cookie_httponly = 1
+; GC ~0.1% of requests (1/1000) - legacy WAMP server parity.
+session.gc_probability = 1
+session.gc_divisor = 1000
 session.gc_maxlifetime = 1440
 
 ; Date / timezone.
@@ -77,9 +88,21 @@ auto_globals_jit = On
 SMTP = localhost
 smtp_port = 25
 
-[mbstring]
-mbstring.language = Neutral
+[mysql]
+mysql.allow_local_infile = On
+mysql.allow_persistent = On
+mysql.cache_size = 2000
+mysql.max_persistent = -1
+mysql.max_links = -1
+mysql.connect_timeout = 60
+mysql.trace_mode = Off
 
 [mysqli]
 mysqli.max_persistent = -1
+mysqli.max_links = -1
+mysqli.cache_size = 2000
 mysqli.default_port = 3306
+mysqli.reconnect = Off
+
+[mbstring]
+mbstring.language = Neutral
