@@ -4,6 +4,10 @@
 
 LoadModule php5_module "@@PHP_ROOT@@/php5apache2_4.dll"
 
+# Point mod_php at the php.ini in the PHP directory so the web SAPI
+# loads the same extensions as the CLI.
+PHPIniDir "@@PHP_ROOT@@"
+
 <FilesMatch \.php$>
     SetHandler application/x-httpd-php
 </FilesMatch>

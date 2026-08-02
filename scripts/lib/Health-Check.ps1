@@ -100,7 +100,7 @@ $dbOk = $false
 if ($phpOk) {
     $db = Join-Path $install 'mariadb\bin\mysql.exe'
     if (Test-Path $db) {
-        $out = & $db -u $dbUser ("-p" + $dbPass) -h 127.0.0.1 -P $mysqlPort -e "SELECT 1;" 2>&1
+        $out = & $db -u $dbUser ("--password=" + $dbPass) -h 127.0.0.1 -P $mysqlPort -e "SELECT 1;" 2>&1
         if ($LASTEXITCODE -eq 0) {
             $dbOk = $true
             Add-Result 'Database login' 'OK' ("user '{0}' can connect" -f $dbUser)

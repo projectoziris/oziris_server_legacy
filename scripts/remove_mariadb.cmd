@@ -24,7 +24,7 @@ if errorlevel 1 (
 ) else (
     echo [INFO] Stopping MariaDB service...
     sc stop MariaDB >nul 2>&1
-    timeout /t 4 /nobreak >nul
+    ping -n 5 127.0.0.1 >nul
     echo [INFO] Deleting MariaDB service...
     sc delete MariaDB >nul
     if errorlevel 1 (

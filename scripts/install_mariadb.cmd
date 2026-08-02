@@ -105,7 +105,7 @@ if errorlevel 1 (
     echo [ERROR] Failed to start MariaDB service. Check "!MDB_DEST!\logs\mysql-error.log".
     exit /b 1
 )
-timeout /t 6 /nobreak >nul
+ping -n 7 127.0.0.1 >nul
 
 set "MYSQL=!MDB_DEST!\bin\mysql.exe"
 
@@ -118,7 +118,7 @@ if errorlevel 1 (
 )
 
 echo [INFO] Creating database "!DB_NAME!" and user "!DB_USER!"...
-"%MYSQL%" -u root --protocol=TCP -h 127.0.0.1 -P !MYSQL_PORT! -p!DB_ROOT_PASS! -e "CREATE DATABASE IF NOT EXISTS \`!DB_NAME!\` CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER IF NOT EXISTS '!DB_USER!'@'localhost' IDENTIFIED BY '!DB_PASS!'; GRANT ALL PRIVILEGES ON \`!DB_NAME!\`.* TO '!DB_USER!'@'localhost'; DELETE FROM mysql.user WHERE user=''; DROP DATABASE IF EXISTS test; FLUSH PRIVILEGES;"
+"%MYSQL%" -u root --protocol=TCP -h 127.0.0.1 -P !MYSQL_PORT! --password=!DB_ROOT_PASS! -e "CREATE DATABASE IF NOT EXISTS `!DB_NAME!` CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER IF NOT EXISTS '!DB_USER!'@'localhost' IDENTIFIED BY '!DB_PASS!'; GRANT ALL PRIVILEGES ON `!DB_NAME!`.* TO '!DB_USER!'@'localhost'; DELETE FROM mysql.user WHERE user=''; DROP DATABASE IF EXISTS test; FLUSH PRIVILEGES;"
 if errorlevel 1 (
     call "%~dp0common.cmd" log "[ERROR] Database creation failed"
     echo [ERROR] Failed to create the application database.
@@ -126,7 +126,7 @@ if errorlevel 1 (
 )
 
 echo [INFO] Verifying connection as "!DB_USER!"...
-"%MYSQL%" -u !DB_USER! -p!DB_PASS! --protocol=TCP -h 127.0.0.1 -P !MYSQL_PORT! -e "SELECT 1;" >nul 2>&1
+"%MYSQL%" -u !DB_USER! --password=!DB_PASS! --protocol=TCP -h 127.0.0.1 -P !MYSQL_PORT! -e "SELECT 1;" >nul 2>&1
 if errorlevel 1 (
     call "%~dp0common.cmd" log "[ERROR] App user connection test failed"
     echo [ERROR] Application user could not connect to the database.

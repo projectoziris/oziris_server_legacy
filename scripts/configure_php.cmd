@@ -21,6 +21,19 @@ if not exist "!PHP_EXE!" (
 if not exist "!PHP_DIR!\tmp" mkdir "!PHP_DIR!\tmp"
 if not exist "!PHP_DIR!\logs" mkdir "!PHP_DIR!\logs"
 
+rem Copy the root dependency DLLs (libeay32, ssleay32, libssh2, ...) into
+rem apache24\bin (httpd.exe's application directory, first in its DLL search
+rem order) AND ext\. The CLI finds them via php.exe's own directory, but the
+rem httpd process does not search the PHP root or ext\; without the copies the
+rem openssl/curl extensions fail to load under mod_php ("Unable to load dynamic
+rem library ... The specified module could not be found").
+for %%d in ("!PHP_DIR!\*.dll") do (
+    if /i not "%%~nxd"=="php5ts.dll" if /i not "%%~nxd"=="php5apache2_2.dll" if /i not "%%~nxd"=="php5apache2_2_filter.dll" if /i not "%%~nxd"=="php5apache2_4.dll" if /i not "%%~nxd"=="php5nsapi.dll" (
+        copy /y "%%d" "!PHP_DIR!\ext\" >nul 2>&1
+        if exist "!APACHE_DEST!\bin" copy /y "%%d" "!APACHE_DEST!\bin\" >nul 2>&1
+    )
+)
+
 rem Compute post_max_size = upload_max_size + 32M
 for /f "delims=MmGg tokens=1" %%a in ("!PHP_UPLOAD_MAX!") do set "UP=%%a"
 set /a POST=UP+32
@@ -65,16 +78,16 @@ if defined MISSING (
 rem Write Apache integration if Apache is installed.
 if exist "!APACHE_DEST!\conf\extra" (
     set "MAP2=%TEMP%\oziris_php_%RANDOM%.map"
-    > "%MAP2%" echo @@PHP_ROOT@@=!PHP_DIR!
+    > "!MAP2!" echo @@PHP_ROOT@@=!PHP_DIR!
     echo [INFO] Generating Apache PHP integration ^(php.conf^)...
     powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0lib\Expand-Config.ps1" -Template "!SERVER_PACK_ROOT!\config\php\php.conf.tpl" -Output "!APACHE_DEST!\conf\extra\php.conf" -MapFile "!MAP2!"
     if errorlevel 1 (
-        del "%MAP2%" >nul 2>&1
+        del "!MAP2!" >nul 2>&1
         call "%~dp0common.cmd" log "[ERROR] php.conf generation failed"
         echo [ERROR] Failed to generate php.conf.
         exit /b 1
     )
-    del "%MAP2%" >nul 2>&1
+    del "!MAP2!" >nul 2>&1
 
     sc query Apache24 >nul 2>&1
     if not errorlevel 1 (
@@ -89,7 +102,7 @@ if exist "!APACHE_DEST!\conf\extra" (
         if not errorlevel 1 (
             echo [INFO] Restarting Apache24...
             sc stop Apache24 >nul
-            timeout /t 3 /nobreak >nul
+            ping -n 4 127.0.0.1 >nul
             sc start Apache24 >nul
         )
     )

@@ -114,7 +114,7 @@ if errorlevel 1 (
     echo [ERROR] Failed to start Apache24 service.
     exit /b 1
 )
-timeout /t 3 /nobreak >nul
+ping -n 4 127.0.0.1 >nul
 
 echo [INFO] Testing HTTP response on port %APACHE_PORT%...
 powershell -NoProfile -Command "try { $r = Invoke-WebRequest -Uri 'http://127.0.0.1:%APACHE_PORT%/' -UseBasicParsing -TimeoutSec 15; exit 0 } catch { exit 1 }"

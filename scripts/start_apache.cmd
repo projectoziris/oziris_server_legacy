@@ -11,7 +11,7 @@ if not errorlevel 1 ( echo [INFO] Apache24 is already running. & exit /b 0 )
 echo [INFO] Starting Apache24...
 sc start Apache24 >nul
 if errorlevel 1 ( echo [ERROR] Failed to start Apache24. & call "%~dp0common.cmd" log "[ERROR] sc start Apache24 failed" & exit /b 1 )
-timeout /t 3 /nobreak >nul
+ping -n 4 127.0.0.1 >nul
 sc query Apache24 | findstr /i "RUNNING" >nul
 if errorlevel 1 ( echo [ERROR] Apache24 did not reach RUNNING state. & call "%~dp0common.cmd" log "[ERROR] Apache24 not RUNNING after start" & exit /b 1 )
 call "%~dp0common.cmd" log "[OK] Apache24 started"

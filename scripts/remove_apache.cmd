@@ -23,7 +23,7 @@ if errorlevel 1 (
 ) else (
     echo [INFO] Stopping Apache24 service...
     sc stop Apache24 >nul 2>&1
-    timeout /t 3 /nobreak >nul
+    ping -n 4 127.0.0.1 >nul
     echo [INFO] Deleting Apache24 service...
     sc delete Apache24 >nul
     if errorlevel 1 (

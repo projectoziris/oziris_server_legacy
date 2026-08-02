@@ -30,7 +30,7 @@ set "SQL=!STAGE!\db\!DB_NAME!.sql"
 set "ZIP=!BACKUP_DIR!\backup_!TS!.zip"
 
 echo [INFO] Dumping database "!DB_NAME!"...
-"!DUMP!" -u !DB_USER! -p!DB_PASS! -h 127.0.0.1 -P !MYSQL_PORT! --default-character-set=utf8 --routines --triggers !DB_NAME! > "!SQL!" 2>nul
+"!DUMP!" -u !DB_USER! --password=!DB_PASS! -h 127.0.0.1 -P !MYSQL_PORT! --default-character-set=utf8 --routines --triggers !DB_NAME! > "!SQL!" 2>nul
 if errorlevel 1 (
     call "%~dp0common.cmd" log "[ERROR] mysqldump failed"
     echo [ERROR] Database dump failed. Is MariaDB running?

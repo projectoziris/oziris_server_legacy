@@ -74,10 +74,10 @@ if not defined SQL (
     if errorlevel 1 (
         echo [INFO] Starting MariaDB...
         sc start MariaDB >nul
-        timeout /t 5 /nobreak >nul
+        ping -n 6 127.0.0.1 >nul
     )
     echo [INFO] Restoring database "!DB_NAME!" from "!SQL!"...
-    "!SERVER_INSTALL_PATH!\mariadb\bin\mysql.exe" -u root -p!DB_ROOT_PASS! -h 127.0.0.1 -P !MYSQL_PORT! !DB_NAME! < "!SQL!"
+    "!SERVER_INSTALL_PATH!\mariadb\bin\mysql.exe" -u root --password=!DB_ROOT_PASS! -h 127.0.0.1 -P !MYSQL_PORT! !DB_NAME! < "!SQL!"
     if errorlevel 1 (
         call "%~dp0common.cmd" log "[ERROR] Database restore failed"
         echo [ERROR] Database restore failed.

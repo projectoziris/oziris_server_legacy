@@ -51,7 +51,7 @@ if not defined NODB (
         ) else (
             for %%f in ("!SQL!") do if %%~zf gtr 0 (
                 echo [INFO] Importing databases into MariaDB...
-                "!SERVER_INSTALL_PATH!\mariadb\bin\mysql.exe" -u root -p!DB_ROOT_PASS! -h 127.0.0.1 -P !MYSQL_PORT! < "!SQL!"
+                "!SERVER_INSTALL_PATH!\mariadb\bin\mysql.exe" -u root --password=!DB_ROOT_PASS! -h 127.0.0.1 -P !MYSQL_PORT! < "!SQL!"
                 if errorlevel 1 (
                     call "%~dp0common.cmd" log "[WARN] Database import failed"
                     echo [WARN] Database import failed. See the dump at "!SQL!".
@@ -97,7 +97,7 @@ if exist "!HTTPD!" (
     if not errorlevel 1 (
         echo [INFO] Restarting Apache24...
         sc stop Apache24 >nul
-        timeout /t 3 /nobreak >nul
+        ping -n 4 127.0.0.1 >nul
         sc start Apache24 >nul
     )
 )
