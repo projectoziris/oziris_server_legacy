@@ -9,6 +9,9 @@ logs/
 backup/
 _tmptest/
 
+# Admin panel credentials (generated at first-run setup)
+config/admin.ini
+
 # OS / editor
 Thumbs.db
 Desktop.ini
