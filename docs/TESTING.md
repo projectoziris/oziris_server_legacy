@@ -22,6 +22,7 @@ Each test script:
 | `test_php.cmd` | `php -m` contains required extensions | missing binary (rc=2) | regenerate config |
 | `test_mariadb.cmd` | service running + DB query | duplicate install (rc=3) | `remove_mariadb.cmd` |
 | `test_phpmyadmin.cmd` | config.inc.php valid PHP | missing distribution (rc=2) | re-deploy |
+| `test_admin.cmd` | files deployed + valid PHP | missing source (rc=2) | re-deploy |
 | `test_firewall.cmd` | rules present | rules removed | re-create |
 | `test_backup.cmd` | archive created + verified | db down (rc=1) | delete archive |
 | `test_restore.cmd` | database restored | corrupt archive refused | no-op on failure |

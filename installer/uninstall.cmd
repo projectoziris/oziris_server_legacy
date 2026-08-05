@@ -40,6 +40,9 @@ call "%~dp0..\scripts\remove_apache.cmd" -KeepFiles >nul 2>&1
 echo [INFO] Removing MariaDB...
 call "%~dp0..\scripts\remove_mariadb.cmd" -KeepFiles >nul 2>&1
 
+echo [INFO] Removing Admin Panel...
+call "%~dp0..\scripts\remove_admin.cmd" -KeepFiles >nul 2>&1
+
 echo [INFO] Removing shortcuts...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\scripts\lib\Create-Shortcuts.ps1" -PackRoot "%~dp0.." -Port "!APACHE_PORT!" -Remove
 if errorlevel 1 (

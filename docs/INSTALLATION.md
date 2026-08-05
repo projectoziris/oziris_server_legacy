@@ -44,8 +44,9 @@ The installer runs every module in order:
 3. MariaDB (install, initialize data dir, register `MariaDB` service, start, create DB + user)
 4. phpMyAdmin (deploy + generate `config.inc.php`)
 5. Windows Services (auto-start both services)
-6. Firewall (inbound TCP rules for HTTP and MariaDB ports)
-7. Shortcuts (Desktop + Start Menu)
+6. Admin Panel (deploy to web root; set credentials on first use)
+7. Firewall (inbound TCP rules for HTTP and MariaDB ports)
+8. Shortcuts (Desktop + Start Menu)
 
 If any step fails, the installer rolls back automatically and logs to `logs\install.log`.
 
@@ -53,6 +54,7 @@ If any step fails, the installer rolls back automatically and logs to `logs\inst
 
 - Web site: http://localhost:80/ (shows the module self-check page)
 - phpMyAdmin: http://localhost:80/phpmyadmin/
+- Admin Panel: http://localhost:80/admin/ (first visit sets the admin credentials)
 - `scripts\health_check.cmd` returns `HEALTHY`
 - `scripts\status_apache.cmd` / `scripts\status_mariadb.cmd` report `RUNNING`
 
@@ -65,6 +67,7 @@ scripts\install_apache.cmd
 scripts\install_php.cmd
 scripts\install_mariadb.cmd
 scripts\deploy_phpmyadmin.cmd
+scripts\deploy_admin.cmd
 scripts\install_services.cmd
 scripts\setup_firewall.cmd
 ```

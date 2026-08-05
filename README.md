@@ -55,12 +55,13 @@ Every script returns a standard exit code:
 | 3 | PHP               | `scripts\install_php.cmd`, `scripts\configure_php.cmd` |
 | 4 | MariaDB           | `scripts\install_mariadb.cmd`, `scripts\remove_mariadb.cmd` |
 | 5 | phpMyAdmin        | `scripts\deploy_phpmyadmin.cmd` |
-| 6 | Windows Services  | `scripts\install_services.cmd`, `start_*.cmd`, `stop_*.cmd`, `restart_*.cmd`, `status_*.cmd` |
-| 7 | Firewall          | `scripts\setup_firewall.cmd`, `scripts\remove_firewall.cmd`, `scripts\verify_firewall.cmd` |
-| 8 | Backup            | `scripts\backup.cmd`, `scripts\restore.cmd` |
-| 9 | Health Check      | `scripts\health_check.cmd` |
-| 10| Migration         | `scripts\migrate_xampp.cmd` |
-| 11| Server Manager   | `scripts\server_manager.cmd` |
-| 12| Installer         | `installer\install.cmd`, `installer\uninstall.cmd` |
+| 6 | Admin Panel       | `scripts\deploy_admin.cmd`, `scripts\remove_admin.cmd` |
+| 7 | Windows Services  | `scripts\install_services.cmd`, `start_*.cmd`, `stop_*.cmd`, `restart_*.cmd`, `status_*.cmd` |
+| 8 | Firewall          | `scripts\setup_firewall.cmd`, `scripts\remove_firewall.cmd`, `scripts\verify_firewall.cmd` |
+| 9 | Backup            | `scripts\backup.cmd`, `scripts\restore.cmd` |
+| 10| Health Check      | `scripts\health_check.cmd` |
+| 11| Migration         | `scripts\migrate_xampp.cmd` |
+| 12| Server Manager   | `scripts\server_manager.cmd` |
+| 13| Installer         | `installer\install.cmd`, `installer\uninstall.cmd` |
 
 See `docs\` for installation, configuration, troubleshooting and rollback per module.

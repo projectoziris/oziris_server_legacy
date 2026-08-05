@@ -13,6 +13,8 @@ function page_dashboard()
     $mem = sys_memory();
     $disk = sys_disk();
     $db = db_info();
+    $ver = sys_versions();
+    $os = sys_os();
 
     $memUsed = ($mem['total_kb'] > 0)
         ? round(100 * ($mem['total_kb'] - $mem['free_kb']) / $mem['total_kb']) : 0;
@@ -21,20 +23,22 @@ function page_dashboard()
 
     page_header('Dashboard', 'dashboard');
 
+    echo '<div class="summary">';
+    echo '<div class="summary-item"><span class="lbl">Host</span><b>' . e(sys_hostname()) . '</b></div>';
+    echo '<div class="summary-item"><span class="lbl">OS</span><b>' . e($os['caption']) . ' (' . e($os['build']) . ')</b></div>';
+    echo '<div class="summary-item"><span class="lbl">Uptime</span><b>' . e(sys_uptime()) . '</b></div>';
+    echo '<div class="summary-item"><span class="lbl">Stack</span><b>' . e($ver['apache']) . ' &middot; ' . e($ver['php']) . ' &middot; ' . e($ver['mariadb']) . '</b></div>';
+    echo '</div>';
+
     echo '<div class="cards">';
     echo card_svc('Apache HTTP', $apache, $httpOk);
     echo card_svc('MariaDB', $maria, $mysqlOk);
     echo '</div>';
 
     echo '<div class="cards">';
-    echo '<div class="card"><h3>CPU Load</h3><div class="gauge-wrap">'
-       . '<div class="gauge" style="--pct:' . (int)$cpu . '"><div class="gauge-inner">' . (int)$cpu . '%</div></div></div></div>';
-    echo '<div class="card"><h3>Memory</h3><div class="gauge-wrap">'
-       . '<div class="gauge" style="--pct:' . (int)$memUsed . '"><div class="gauge-inner">' . (int)$memUsed . '%</div></div></div>'
-       . '<p class="sub">' . $memFreeMb . ' MB free</p></div>';
-    echo '<div class="card"><h3>Disk (' . e(substr(OZI_INSTALL, 0, 2)) . ')</h3><div class="gauge-wrap">'
-       . '<div class="gauge" style="--pct:' . (int)$disk['free_pct'] . '"><div class="gauge-inner">' . (int)$disk['free_pct'] . '%</div></div></div>'
-       . '<p class="sub">' . $diskFreeGb . ' GB free</p></div>';
+    echo metric_card('CPU Load', (int)$cpu . '%', 'Current utilization', meter_class((int)$cpu), (int)$cpu);
+    echo metric_card('Memory', (int)$memUsed . '% used', $memFreeMb . ' MB free of ' . round($mem['total_kb'] / 1024, 1) . ' GB', meter_class((int)$memUsed), (int)$memUsed);
+    echo metric_card('Disk (' . e(substr(OZI_INSTALL, 0, 2)) . ')', $diskFreeGb . ' GB free', round($disk['total'] / 1073741824, 1) . ' GB total', meter_class(100 - (int)$disk['free_pct']), 100 - (int)$disk['free_pct']);
     echo '</div>';
 
     echo '<div class="cards">';
@@ -55,6 +59,14 @@ function page_dashboard()
     echo '</div>';
 
     page_footer();
+}
+
+function metric_card($label, $value, $detail, $cls, $pct)
+{
+    return '<div class="card"><h3>' . e($label) . '</h3>'
+        . '<div class="metric"><div class="metric-val">' . e($value) . '</div>'
+        . '<div class="metric-lbl">' . e($detail) . '</div></div>'
+        . '<div class="meter ' . $cls . '"><div class="meter-fill" style="width:' . (int)$pct . '%"></div></div></div>';
 }
 
 function card_svc($label, $state, $listening)

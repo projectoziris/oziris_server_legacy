@@ -28,7 +28,7 @@ echo  ================================================
 echo.
 
 set "SCRIPTS=%~dp0..\scripts"
-set "TOTAL=7"
+set "TOTAL=8"
 
 echo [ 1/!TOTAL! ] Installing Apache...
 call "!SCRIPTS!\install_apache.cmd"
@@ -50,11 +50,15 @@ echo [ 5/!TOTAL! ] Configuring Windows Services...
 call "!SCRIPTS!\install_services.cmd"
 if errorlevel 1 goto :fail
 
-echo [ 6/!TOTAL! ] Configuring Firewall...
+echo [ 6/!TOTAL! ] Deploying Admin Panel...
+call "!SCRIPTS!\deploy_admin.cmd"
+if errorlevel 3 ( echo [INFO] Admin panel source missing - continuing. ) else if errorlevel 1 goto :fail
+
+echo [ 7/!TOTAL! ] Configuring Firewall...
 call "!SCRIPTS!\setup_firewall.cmd"
 if errorlevel 1 goto :fail
 
-echo [ 7/!TOTAL! ] Creating shortcuts...
+echo [ 8/!TOTAL! ] Creating shortcuts...
 powershell -NoProfile -ExecutionPolicy Bypass -File "!SCRIPTS!\lib\Create-Shortcuts.ps1" -PackRoot "%~dp0.." -Port "!APACHE_PORT!"
 if errorlevel 1 goto :fail
 
@@ -77,6 +81,7 @@ echo  ================================================
 echo   Installation complete.
 echo   - Web site      : http://localhost:!APACHE_PORT!/
 echo   - phpMyAdmin    : http://localhost:!APACHE_PORT!/phpmyadmin/
+echo   - Admin Panel   : http://localhost:!APACHE_PORT!/admin/
 echo   - Server Manager: "!SCRIPTS!\server_manager.cmd"
 echo  ================================================
 echo.

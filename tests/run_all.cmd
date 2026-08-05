@@ -7,7 +7,7 @@ setlocal EnableDelayedExpansion
 set "FAILED=0"
 set "SKIPPED=0"
 
-for %%t in (test_config test_apache test_php test_mariadb test_phpmyadmin test_firewall test_backup test_restore test_health) do (
+for %%t in (test_config test_apache test_php test_mariadb test_phpmyadmin test_admin test_firewall test_backup test_restore test_health) do (
     echo.
     echo ===== %%t =====
     call "%~dp0%%t.cmd"

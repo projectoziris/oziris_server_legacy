@@ -62,7 +62,7 @@ echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />';
 echo '<title>Sign in - OZI-RIS Admin</title>';
 echo '<link rel="stylesheet" href="assets/admin.css" />';
 echo '</head><body class="loginbody"><div class="loginwrap">';
-echo '<div class="loginbrand">OZI-RIS<br /><small>Server Manager</small></div>';
+echo '<div class="loginbrand"><div>OZI-RIS<small>Server Manager</small></div></div>';
 echo '<h2>' . ($needsSetup ? 'Create administrator account' : 'Sign in') . '</h2>';
 if ($error) { echo '<div class="alert error">' . e($error) . '</div>'; }
 if ($needsSetup) {
